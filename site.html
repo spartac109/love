@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You 🌸👽</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000000;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            color: #ecefec;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.2s ease-in-out, visibility 1.2s;
+        }
+
+        .hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .lyrics-overlay {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            pointer-events: none;
+            padding: 20px;
+        }
+
+        .line {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 15px 0;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            text-shadow: 0 0 10px rgba(255, 71, 126, 0.6), 0 0 20px rgba(255, 71, 126, 0.4);
+        }
+
+        .line.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .neon-center-set {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 20;
+            user-select: none;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+
+        .neon-text {
+            color: #ffccff;
+            font-size: 26pt;
+            text-align: center;
+            margin-bottom: 15px;
+            font-family: 'Press Start 2P', monospace;
+            text-shadow: 0 0 5px #ffccff, 0 0 15px #ff3399, 0 0 30px #ff3399;
+        }
+
+        .neon-heart-svg {
+            width: 140px;
+            height: 140px;
+            filter: drop-shadow(0 0 4px #ffccff) drop-shadow(0 0 10px #ff3399) drop-shadow(0 0 25px #ff3399);
+        }
+
+        .matrix-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            overflow: hidden;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 1s ease;
+            background-color: #000;
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        .matrix-column {
+            display: flex;
+            flex-direction: column;
+            white-space: nowrap;
+            font-size: 11px;
+            line-height: 1.8;
+            color: rgba(255, 51, 153, 0.55);
+            user-select: none;
+        }
+
+        .matrix-move {
+            animation: scrollDown 10s linear infinite;
+        }
+
+        .matrix-column:nth-child(even) .matrix-move {
+            animation: scrollDown 7s linear infinite;
+        }
+
+        @keyframes scrollDown {
+            0% {
+                transform: translateY(-50%);
+            }
+
+            100% {
+                transform: translateY(0%);
+            }
+        }
+
+        #main-card {
+            background: linear-gradient(135deg, #160410 0%, #000000 100%);
+            overflow-y: auto;
+            padding: 40px 20px;
+            justify-content: flex-start;
+            z-index: 30;
+        }
+
+        .card-content {
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            margin: auto;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .heart-icon {
+            font-size: 55px;
+            animation: pulse 1.5s infinite;
+            text-shadow: 0 0 15px #ff477e;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #ff758f;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 117, 143, 0.5);
+        }
+
+        .main-p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #d8b4f8;
+            margin-bottom: 35px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .grid-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 71, 126, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-5px);
+            border-color: #ff477e;
+        }
+
+        .grid-item h3 {
+            font-size: 16px;
+            color: #ff758f;
+            margin-bottom: 5px;
+        }
+
+        .grid-item span {
+            font-size: 13px;
+            color: #ecefec;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="scene-intro" class="screen">
+        <div id="canvas-container">
+            <canvas id="sakuraCanvas"></canvas>
+        </div>
+        <div class="lyrics-overlay">
+            <div class="line" id="line1">Я люблю тебя</div>
+            <div class="line" id="line2">Как сакуру японки &lt;3</div>
+            <div class="line" id="line3">Я дальше не помню что там</div>
+        </div>
+    </div>
+
+    <div class="matrix-bg" id="bgContainer" style="display: none;"></div>
+    <div class="neon-center-set" id="neonSet" style="display: none; opacity: 0;">
+        <div class="neon-text">LOVE YOU</div>
+        <svg class="neon-heart-svg" viewBox="0 0 24 24" fill="#ffccff">
+            <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+        </svg>
+    </div>
+
+    <div id="main-card" class="screen hidden">
+        <div class="card-content">
+            <div class="heart-icon">🌸</div>
+            <h1>Для тебя, Миньон</h1>
+            <p class="main-p">Я не умею делать открытки то вот</p>
+
+            <div class="grid">
+                <div class="grid-item">
+                    <h3>Твоя Свага</h3>
+                    <span>Рялна</span>
+                </div>
+                <div class="grid-item">
+                    <h3>Карапузик</h3>
+                    <span>Миньон</span>
+                </div>
+                <div class="grid-item">
+                    <h3>67</h3>
+                    <span>газан</span>
+                </div>
+                <div class="grid-item">
+                    <h3>Просто спасибо</h3>
+                    <span>За то что ты есть рядом 🤍</span>
+                </div>
+            </div>
+            <p style="font-size: 12px; color: #555; font-family: monospace;">crafted with love & code</p>
+        </div>
+    </div>
+
+    <script>
+        const t1 = 1500;
+        const t2 = 3500;
+        const t3 = 6500;
+        const tToMatrix = 11000;
+        const tToFinal = 16000;
+
+        setTimeout(() => document.getElementById('line1').classList.add('active'), t1);
+        setTimeout(() => {
+            document.getElementById('line2').classList.add('active');
+            startTreeGrowth();
+        }, t2);
+        setTimeout(() => document.getElementById('line3').classList.add('active'), t3);
+
+        setTimeout(() => {
+            document.getElementById('scene-intro').classList.add('hidden');
+
+            buildMatrixBackground();
+            const bgContainer = document.getElementById('bgContainer');
+            const neonSet = document.getElementById('neonSet');
+
+            bgContainer.style.display = 'flex';
+            neonSet.style.display = 'flex';
+
+            setTimeout(() => {
+                bgContainer.style.opacity = '1';
+                neonSet.style.opacity = '1';
+            }, 50);
+        }, tToMatrix);
+
+        setTimeout(() => {
+            const bgContainer = document.getElementById('bgContainer');
+            const neonSet = document.getElementById('neonSet');
+
+            bgContainer.style.opacity = '0';
+            neonSet.style.opacity = '0';
+
+            setTimeout(() => {
+                bgContainer.style.display = 'none';
+                neonSet.style.display = 'none';
+                document.getElementById('main-card').classList.remove('hidden');
+            }, 1000);
+        }, tToFinal);
+
+
+        function buildMatrixBackground() {
+            const bgContainer = document.getElementById('bgContainer');
+            bgContainer.innerHTML = '';
+
+            const charWidth = 95;
+            const columnCount = Math.ceil(window.innerWidth / charWidth) + 1;
+
+            let textBlock = "";
+            for (let i = 0; i < 60; i++) {
+                textBlock += "LOVE YOU<br>";
+            }
+
+            for (let i = 0; i < columnCount; i++) {
+                const col = document.createElement('div');
+                col.className = 'matrix-column';
+
+                const moveDiv = document.createElement('div');
+                moveDiv.className = 'matrix-move';
+                moveDiv.innerHTML = textBlock + textBlock;
+
+                col.style.opacity = (Math.random() * 0.4 + 0.3).toFixed(2);
+                moveDiv.style.animationDelay = (Math.random() * -10) + 's';
+
+                col.appendChild(moveDiv);
+                bgContainer.appendChild(col);
+            }
+        }
+        window.addEventListener('resize', buildMatrixBackground);
+
+        const canvas = document.getElementById('sakuraCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let elementsToDraw = [];
+        let animationProgress = 0;
+
+        function generateTree(x, y, angle, length, branchWidth, depth) {
+            if (depth === 0) return;
+
+            let x2 = x + Math.cos(angle * Math.PI / 180) * length;
+            let y2 = y + Math.sin(angle * Math.PI / 180) * length;
+
+            let steps = Math.floor(length / 12);
+            for (let i = 0; i <= steps; i++) {
+                let t = i / steps;
+                elementsToDraw.push({
+                    x: x + (x2 - x) * t,
+                    y: y + (y2 - y) * t,
+                    text: depth > 6 ? '|' : (Math.random() > 0.5 ? '/' : '\\'),
+                    type: 'branch',
+                    fontSize: Math.max(12, branchWidth * 1.5),
+                    order: 12 - depth
+                });
+            }
+
+            if (depth <= 3) {
+                let flowerCount = Math.floor(Math.random() * 2) + 1;
+                for (let i = 0; i < flowerCount; i++) {
+                    elementsToDraw.push({
+                        x: x2 + (Math.random() * 40 - 20),
+                        y: y2 + (Math.random() * 40 - 20),
+                        type: 'flower',
+                        size: Math.random() * 5 + 3,
+                        color: Math.random() > 0.4 ? 'rgba(255, 117, 143, 0.8)' : 'rgba(255, 71, 126, 0.9)',
+                        order: 55
+                    });
+                }
+            }
+
+            let numBranches = 2;
+            for (let i = 0; i < numBranches; i++) {
+                let angleOffset = i === 0 ? -(Math.random() * 25 + 15) : (Math.random() * 25 + 15);
+                generateTree(x2, y2, angle + angleOffset, length * 0.75, branchWidth * 0.65, depth - 1);
+            }
+        }
+
+        function startTreeGrowth() {
+            elementsToDraw = [];
+            generateTree(canvas.width / 2, canvas.height, -90, canvas.height * 0.2, 6, 8);
+            elementsToDraw.sort((a, b) => a.order - b.order);
+            animate();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            animationProgress += 15;
+            let currentDrawLimit = Math.min(animationProgress, elementsToDraw.length);
+
+            for (let i = 0; i < currentDrawLimit; i++) {
+                let el = elementsToDraw[i];
+                if (el.type === 'branch') {
+                    ctx.fillStyle = 'rgba(74, 44, 58, 0.7)';
+                    ctx.font = `${el.fontSize}px Arial`;
+                    ctx.shadowBlur = 0;
+                    ctx.fillText(el.text, el.x, el.y);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(el.x, el.y, el.size, 0, Math.PI * 2);
+                    ctx.fillStyle = el.color;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#ff477e';
+                    ctx.fill();
+                }
+            }
+            if (currentDrawLimit < elementsToDraw.length) {
+                requestAnimationFrame(animate);
+            } else {
+                startFallingLeaves();
+            }
+        }
+
+        let leaves = [];
+        function startFallingLeaves() {
+            for (let i = 0; i < 25; i++) {
+                leaves.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    speed: Math.random() * 1.0 + 0.5,
+                    size: Math.random() * 3 + 2,
+                    color: 'rgba(255, 117, 143, 0.7)'
+                });
+            }
+            updateLeaves();
+        }
+
+        function updateLeaves() {
+            if (document.getElementById('scene-intro').classList.contains('hidden')) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let el of elementsToDraw) {
+                if (el.type === 'branch') {
+                    ctx.fillStyle = 'rgba(74, 44, 58, 0.6)';
+                    ctx.font = `${el.fontSize}px Arial`;
+                    ctx.shadowBlur = 0;
+                    ctx.fillText(el.text, el.x, el.y);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(el.x, el.y, el.size, 0, Math.PI * 2);
+                    ctx.fillStyle = el.color;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = '#ff477e';
+                    ctx.fill();
+                }
+            }
+            for (let leaf of leaves) {
+                leaf.y += leaf.speed;
+                leaf.x += Math.sin(leaf.y / 50) * 0.3;
+                ctx.beginPath();
+                ctx.arc(leaf.x, leaf.y, leaf.size, 0, Math.PI * 2);
+                ctx.fillStyle = leaf.color;
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = '#ff477e';
+                ctx.fill();
+                if (leaf.y > canvas.height) {
+                    leaf.y = -20;
+                    leaf.x = Math.random() * canvas.width;
+                }
+            }
+            requestAnimationFrame(updateLeaves);
+        }
+    </script>
+</body>
+
+</html>
