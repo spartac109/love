@@ -266,6 +266,7 @@
                 opacity: 1;
                 transform: translate(-50%, -50%) scale(1) rotate(0deg);
             }
+
             100% {
                 opacity: 0;
                 transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) - 60px)) scale(0.2) rotate(var(--rot));
@@ -286,6 +287,7 @@
                 opacity: 1;
                 transform: translate(0, 0) rotate(0deg) scale(1);
             }
+
             100% {
                 opacity: 0;
                 transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0.4);
@@ -319,25 +321,25 @@
     <div id="main-card" class="screen hidden">
         <div class="card-content">
             <div class="heart-icon">🌸</div>
-            <h1>Text</h1>
-            <p class="main-p">Text</p>
+            <h1>Лашара</h1>
+            <p class="main-p">американ</p>
 
             <div class="grid">
                 <div class="grid-item">
-                    <h3>Text</h3>
-                    <span>Text</span>
+                    <h3>ну рялна</h3>
+                    <span>лашара</span>
                 </div>
                 <div class="grid-item">
-                    <h3>Text</h3>
-                    <span>Text</span>
+                    <h3>а еше ты</h3>
+                    <span>абязянка</span>
                 </div>
                 <div class="grid-item">
-                    <h3>Text</h3>
-                    <span>Text</span>
+                    <h3>и еше ты</h3>
+                    <span>красотуля</span>
                 </div>
                 <div class="grid-item">
-                    <h3>Text</h3>
-                    <span>Text</span>
+                    <h3>и еше ты</h3>
+                    <span>краш</span>
                 </div>
             </div>
             <p style="font-size: 12px; color: #555; font-family: monospace;">Для фанатки 67</p>
@@ -537,80 +539,61 @@
             }
         }
 
-        function drawPetal(cx, cy, size, rotation, alpha) {
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(rotation);
-            ctx.globalAlpha = alpha;
-
-            const gradient = ctx.createRadialGradient(0, -size * 0.3, 0, 0, 0, size);
-            gradient.addColorStop(0, 'rgba(255, 200, 220, 1)');
-            gradient.addColorStop(0.5, 'rgba(255, 130, 170, 0.9)');
-            gradient.addColorStop(1, 'rgba(220, 60, 120, 0.3)');
-
-            ctx.shadowBlur = 12;
-            ctx.shadowColor = 'rgba(255, 80, 140, 0.7)';
-
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.bezierCurveTo(
-                size * 0.6, -size * 0.2,
-                size * 0.7, -size * 1.0,
-                0, -size * 1.2
-            );
-            ctx.bezierCurveTo(
-                -size * 0.7, -size * 1.0,
-                -size * 0.6, -size * 0.2,
-                0, 0
-            );
-            ctx.fillStyle = gradient;
-            ctx.fill();
-            ctx.restore();
+        function drawPetalOn(tctx, cx, cy, size, rotation, alpha) {
+            tctx.save();
+            tctx.translate(cx, cy);
+            tctx.rotate(rotation);
+            tctx.globalAlpha = alpha;
+            tctx.beginPath();
+            tctx.moveTo(0, 0);
+            tctx.bezierCurveTo(size * 0.6, -size * 0.2, size * 0.7, -size * 1.0, 0, -size * 1.2);
+            tctx.bezierCurveTo(-size * 0.7, -size * 1.0, -size * 0.6, -size * 0.2, 0, 0);
+            tctx.fillStyle = 'rgba(255, 160, 195, 0.88)';
+            tctx.fill();
+            tctx.restore();
         }
 
-        function drawSakuraFlower(cx, cy, size, alpha) {
-            const petals = 5;
-            for (let i = 0; i < petals; i++) {
-                drawPetal(cx, cy, size, (i / petals) * Math.PI * 2, alpha);
+        function drawSakuraFlowerOn(tctx, cx, cy, size, alpha) {
+            for (let i = 0; i < 5; i++) {
+                drawPetalOn(tctx, cx, cy, size, (i / 5) * Math.PI * 2, alpha);
             }
-            ctx.save();
-            ctx.globalAlpha = alpha;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#ffe0f0';
-            ctx.beginPath();
-            ctx.arc(cx, cy, size * 0.25, 0, Math.PI * 2);
-            const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, size * 0.25);
-            cg.addColorStop(0, '#fff8ff');
-            cg.addColorStop(1, '#ffaacc');
-            ctx.fillStyle = cg;
-            ctx.fill();
-            ctx.restore();
+            tctx.save();
+            tctx.globalAlpha = alpha;
+            tctx.beginPath();
+            tctx.arc(cx, cy, size * 0.22, 0, Math.PI * 2);
+            tctx.fillStyle = '#ffe8f5';
+            tctx.fill();
+            tctx.restore();
         }
 
-        function drawBranch(b) {
-            const px = b.x1 + (b.x2 - b.x1) * b.progress;
-            const py = b.y1 + (b.y2 - b.y1) * b.progress;
-
-            ctx.save();
-            ctx.shadowBlur = b.width > 3 ? 8 : 3;
-            ctx.shadowColor = 'rgba(180, 80, 120, 0.4)';
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-
-            const grad = ctx.createLinearGradient(b.x1, b.y1, b.x2, b.y2);
-            grad.addColorStop(0, `rgba(60, 25, 40, ${Math.min(0.9, b.width * 0.12 + 0.4)})`);
-            grad.addColorStop(1, `rgba(120, 50, 80, ${Math.min(0.7, b.width * 0.08 + 0.2)})`);
-
-            ctx.strokeStyle = grad;
-            ctx.lineWidth = Math.max(0.8, b.width);
-            ctx.beginPath();
-            ctx.moveTo(b.x1, b.y1);
-            ctx.lineTo(px, py);
-            ctx.stroke();
-            ctx.restore();
+        function drawBranchOn(tctx, b, progress) {
+            const px = b.x1 + (b.x2 - b.x1) * progress;
+            const py = b.y1 + (b.y2 - b.y1) * progress;
+            tctx.lineCap = 'round';
+            tctx.lineJoin = 'round';
+            const alpha1 = Math.min(0.9, b.width * 0.12 + 0.4);
+            const alpha2 = Math.min(0.7, b.width * 0.08 + 0.2);
+            tctx.strokeStyle = b.width > 2
+                ? `rgba(70, 28, 45, ${alpha1})`
+                : `rgba(120, 55, 80, ${alpha2})`;
+            tctx.lineWidth = Math.max(0.8, b.width);
+            tctx.beginPath();
+            tctx.moveTo(b.x1, b.y1);
+            tctx.lineTo(px, py);
+            tctx.stroke();
         }
 
+        let offscreen = null;
         let sakuraAnimId = null;
+
+        function bakeTreeToOffscreen() {
+            offscreen = document.createElement('canvas');
+            offscreen.width = canvas.width;
+            offscreen.height = canvas.height;
+            const offCtx = offscreen.getContext('2d');
+            for (let b of branches) drawBranchOn(offCtx, b, 1);
+            for (let f of flowers) drawSakuraFlowerOn(offCtx, f.x, f.y, f.size, f.alpha);
+        }
 
         function animateSakura(ts) {
             if (!growthStart) growthStart = ts;
@@ -618,27 +601,18 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const baseGrad = ctx.createRadialGradient(
-                canvas.width / 2, canvas.height, 0,
-                canvas.width / 2, canvas.height, canvas.height * 0.4
-            );
-            baseGrad.addColorStop(0, 'rgba(80, 10, 40, 0.18)');
-            baseGrad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = baseGrad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             for (let b of branches) {
                 const branchDelay = (10 - b.depth) * (GROW_DURATION / 13);
                 const branchDur = GROW_DURATION * 0.35;
                 const t = Math.max(0, Math.min(1, (elapsed - branchDelay) / branchDur));
                 b.progress = easeOut(t);
-                if (b.progress > 0) drawBranch(b);
+                if (b.progress > 0) drawBranchOn(ctx, b, b.progress);
             }
 
             for (let f of flowers) {
                 const ft = Math.max(0, Math.min(1, (elapsed - f.delay) / 600));
                 f.alpha = easeOut(ft) * (0.75 + f.depth * 0.05);
-                if (f.alpha > 0) drawSakuraFlower(f.x, f.y, f.size, f.alpha);
+                if (f.alpha > 0) drawSakuraFlowerOn(ctx, f.x, f.y, f.size, f.alpha);
             }
 
             const allDone = elapsed > GROW_DURATION + 900;
@@ -646,6 +620,7 @@
                 sakuraAnimId = requestAnimationFrame(animateSakura);
             } else {
                 treeReady = true;
+                bakeTreeToOffscreen();
                 startFallingLeaves();
             }
         }
@@ -659,6 +634,7 @@
             flowers = [];
             treeReady = false;
             growthStart = null;
+            offscreen = null;
             const baseLen = Math.min(canvas.height * 0.22, 200);
             generateTree(canvas.width / 2, canvas.height + 10, -90, baseLen, 14, 9);
             branches.sort((a, b) => b.depth - a.depth);
@@ -668,10 +644,25 @@
         let leaves = [];
         let leavesAnimId = null;
 
+        const LEAF_SIZES = [3, 5, 7];
+        const leafSprites = LEAF_SIZES.map(size => {
+            const lc = document.createElement('canvas');
+            const pad = size * 1.5;
+            lc.width = size * 2 + pad * 2;
+            lc.height = size * 2.4 + pad * 2;
+            const lx = lc.getContext('2d');
+            lx.translate(lc.width / 2, size * 1.2 + pad);
+            lx.beginPath();
+            lx.moveTo(0, 0);
+            lx.bezierCurveTo(size * 0.6, -size * 0.2, size * 0.7, -size, 0, -size * 1.2);
+            lx.bezierCurveTo(-size * 0.7, -size, -size * 0.6, -size * 0.2, 0, 0);
+            lx.fillStyle = 'rgba(255, 160, 200, 0.85)';
+            lx.fill();
+            return lc;
+        });
+
         function startFallingLeaves() {
-            for (let i = 0; i < 40; i++) {
-                leaves.push(createLeaf(true));
-            }
+            for (let i = 0; i < 28; i++) leaves.push(createLeaf(true));
             leavesAnimId = requestAnimationFrame(updateLeaves);
         }
 
@@ -679,66 +670,36 @@
             return {
                 x: Math.random() * canvas.width,
                 y: randomY ? Math.random() * canvas.height : -20,
-                speed: Math.random() * 1.2 + 0.4,
-                size: Math.random() * 5 + 3,
+                speed: Math.random() * 1.0 + 0.4,
+                spriteIdx: Math.floor(Math.random() * LEAF_SIZES.length),
                 rotation: Math.random() * Math.PI * 2,
-                rotSpeed: (Math.random() - 0.5) * 0.04,
+                rotSpeed: (Math.random() - 0.5) * 0.03,
                 swing: Math.random() * Math.PI * 2,
-                swingSpeed: Math.random() * 0.025 + 0.01,
-                alpha: Math.random() * 0.4 + 0.5
+                swingSpeed: Math.random() * 0.02 + 0.008,
+                alpha: Math.random() * 0.35 + 0.55
             };
-        }
-
-        function drawLeaf(leaf) {
-            ctx.save();
-            ctx.translate(leaf.x, leaf.y);
-            ctx.rotate(leaf.rotation);
-            ctx.globalAlpha = leaf.alpha;
-
-            const s = leaf.size;
-            const grad = ctx.createRadialGradient(0, -s * 0.3, 0, 0, 0, s);
-            grad.addColorStop(0, 'rgba(255, 210, 225, 0.95)');
-            grad.addColorStop(0.6, 'rgba(255, 130, 170, 0.8)');
-            grad.addColorStop(1, 'rgba(210, 50, 110, 0.1)');
-
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = 'rgba(255,100,150,0.6)';
-
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.bezierCurveTo(s * 0.6, -s * 0.2, s * 0.7, -s, 0, -s * 1.2);
-            ctx.bezierCurveTo(-s * 0.7, -s, -s * 0.6, -s * 0.2, 0, 0);
-            ctx.fillStyle = grad;
-            ctx.fill();
-            ctx.restore();
-        }
-
-        function renderTreeStill() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const baseGrad = ctx.createRadialGradient(
-                canvas.width / 2, canvas.height, 0,
-                canvas.width / 2, canvas.height, canvas.height * 0.4
-            );
-            baseGrad.addColorStop(0, 'rgba(80, 10, 40, 0.18)');
-            baseGrad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = baseGrad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            for (let b of branches) { b.progress = 1; drawBranch(b); }
-            for (let f of flowers) drawSakuraFlower(f.x, f.y, f.size, f.alpha);
         }
 
         function updateLeaves() {
             if (document.getElementById('scene-intro').classList.contains('hidden')) return;
 
-            renderTreeStill();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (offscreen) ctx.drawImage(offscreen, 0, 0);
 
             for (let leaf of leaves) {
                 leaf.swing += leaf.swingSpeed;
-                leaf.x += Math.sin(leaf.swing) * 0.8;
+                leaf.x += Math.sin(leaf.swing) * 0.7;
                 leaf.y += leaf.speed;
                 leaf.rotation += leaf.rotSpeed;
-                drawLeaf(leaf);
+
+                const sp = leafSprites[leaf.spriteIdx];
+                ctx.save();
+                ctx.globalAlpha = leaf.alpha;
+                ctx.translate(leaf.x, leaf.y);
+                ctx.rotate(leaf.rotation);
+                ctx.drawImage(sp, -sp.width / 2, -sp.height / 2);
+                ctx.restore();
+
                 if (leaf.y > canvas.height + 20) {
                     Object.assign(leaf, createLeaf(false));
                 }
